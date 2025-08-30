@@ -1,0 +1,5 @@
+"Sprite"
+{
+	"$basetexture" "vgui/entities/junk_launcher"
+	"$nolod" 1
+}
