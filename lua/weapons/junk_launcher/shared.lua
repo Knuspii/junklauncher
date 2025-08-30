@@ -1,25 +1,26 @@
 AddCSLuaFile()
 SWEP.Base = "weapon_base"
-SWEP.PrintName		= "Junk Launcher"
-SWEP.Slot		= 4
-SWEP.SlotPos		= 3		
-SWEP.DrawAmmo		= true				
-SWEP.DrawCrosshair	= true		
-SWEP.ViewModel		= "models/weapons/v_rpg.mdl"	
-SWEP.WorldModel		= "models/weapons/w_rocket_launcher.mdl"	
-SWEP.ReloadSound	= "weapons/rpg/rocket1.wav"	
-SWEP.HoldType	        = "rpg"
-			
+SWEP.PrintName = "Junk Launcher"
+SWEP.Slot = 4
+SWEP.SlotPos = 3
+SWEP.DrawAmmo = true
+SWEP.DrawCrosshair = true
+SWEP.ViewModel = "models/weapons/v_rpg.mdl"
+SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
+SWEP.ReloadSound = "weapons/rpg/rocket1.wav"
+SWEP.HoldType = "rpg"
+
 -- Other settings
-SWEP.Weight		= 1			
-SWEP.AutoSwitchTo	= false			
-SWEP.Spawnable		= true		
- 
+SWEP.Weight = 1
+SWEP.AutoSwitchTo = false
+SWEP.Spawnable = true
+
 -- Weapon info
-SWEP.Author		= "Knuspii"
-SWEP.Contact		= "Knuspii"
-SWEP.Instructions	= "Left-Click to shoot junk"
-SWEP.Category 		= "Junk Launcher"
+SWEP.Author = "Knuspii"
+SWEP.Contact = "Knuspii"
+SWEP.Instructions = "Left-Click to shoot junk"
+SWEP.Category = "Junk Launcher"
+
 -- Weapon Model
 SWEP.VElements = {
 	["Trash"] = { type = "Model", model = "models/props_trainstation/trashcan_indoor001b.mdl", bone = "base", rel = "", pos = Vector(0.301, -0.32, 0), angle = Angle(0, 10.472, 0), size = Vector(0.386, 0.423, 1.243), color = Color(255, 255, 255, 255), surpresslightning = false, material = "", skin = 0, bodygroup = {} }
@@ -29,40 +30,34 @@ SWEP.WElements = {
 }
 
 -- Primary fire settings
-SWEP.Primary.Sound		= "Weapon_PhysCannon.Launch"	
-SWEP.Primary.Damage		= 100
-SWEP.Primary.NumShots	= 1	
-SWEP.Primary.Recoil		= 15	
-SWEP.Primary.Cone		= 3		
-SWEP.Primary.Delay		= 0.3
-SWEP.Primary.ClipSize		= 1		
-SWEP.Primary.DefaultClip	= 10	
-SWEP.Primary.Tracer			= 1			
-SWEP.Primary.Force			= 200
-SWEP.Primary.Automatic		= false
-SWEP.Primary.Ammo		= "RPG_Round"
-
-
+SWEP.Primary.Sound = "Weapon_PhysCannon.Launch"
+SWEP.Primary.Damage = 100
+SWEP.Primary.NumShots = 1
+SWEP.Primary.Recoil = 15
+SWEP.Primary.Cone = 3
+SWEP.Primary.Delay = 0.3
+SWEP.Primary.ClipSize = 1
+SWEP.Primary.DefaultClip = 10
+SWEP.Primary.Tracer = 1
+SWEP.Primary.Force = 200
+SWEP.Primary.Automatic = false
+SWEP.Primary.Ammo = "RPG_Round"
 
 function SWEP:Initialize()
 	self:SetWeaponHoldType( self.HoldType )
 
 if CLIENT then
-	
 		// Create a new table for every weapon instance
 		self.VElements = table.FullCopy( self.VElements )
 		self.WElements = table.FullCopy( self.WElements )
 		self.ViewModelBoneMods = table.FullCopy( self.ViewModelBoneMods )
-
 		self:CreateModels(self.VElements) // create viewmodels
 		self:CreateModels(self.WElements) // create worldmodels
-		
 		// init view model bone build function
 		if IsValid(self.Owner) then
 			local vm = self.Owner:GetViewModel()
 			if IsValid(vm) then
 				self:ResetBonePositions(vm)
-				
 				// Init viewmodel visibility
 				if (self.ShowViewModel == nil or self.ShowViewModel) then
 					vm:SetColor(Color(255,255,255,255))
@@ -75,20 +70,16 @@ if CLIENT then
 				end
 			end
 		end
-		
 	end
-
 end
 
 function SWEP:Holster()
-	
 	if CLIENT and IsValid(self.Owner) then
 		local vm = self.Owner:GetViewModel()
 		if IsValid(vm) then
 			self:ResetBonePositions(vm)
 		end
 	end
-	
 	return true
 end
 
@@ -97,22 +88,15 @@ function SWEP:OnRemove()
 end
 
 if CLIENT then
-
 	SWEP.vRenderOrder = nil
 	function SWEP:ViewModelDrawn()
-		
 		local vm = self.Owner:GetViewModel()
 		if !IsValid(vm) then return end
-		
 		if (!self.VElements) then return end
-		
 		self:UpdateBonePositions(vm)
-
 		if (!self.vRenderOrder) then
-			
 			// we build a render order because sprites need to be drawn after models
 			self.vRenderOrder = {}
-
 			for k, v in pairs( self.VElements ) do
 				if (v.type == "Model") then
 					table.insert(self.vRenderOrder, 1, k)
@@ -120,37 +104,26 @@ if CLIENT then
 					table.insert(self.vRenderOrder, k)
 				end
 			end
-			
 		end
-
 		for k, name in ipairs( self.vRenderOrder ) do
-		
 			local v = self.VElements[name]
 			if (!v) then self.vRenderOrder = nil break end
 			if (v.hide) then continue end
-			
 			local model = v.modelEnt
 			local sprite = v.spriteMaterial
-			
 			if (!v.bone) then continue end
-			
 			local pos, ang = self:GetBoneOrientation( self.VElements, v, vm )
-			
 			if (!pos) then continue end
-			
 			if (v.type == "Model" and IsValid(model)) then
-
 				model:SetPos(pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z )
 				ang:RotateAroundAxis(ang:Up(), v.angle.y)
 				ang:RotateAroundAxis(ang:Right(), v.angle.p)
 				ang:RotateAroundAxis(ang:Forward(), v.angle.r)
-
 				model:SetAngles(ang)
-				//model:SetModelScale(v.size)
 				local matrix = Matrix()
 				matrix:Scale(v.size)
 				model:EnableMatrix( "RenderMultiply", matrix )
-				
+
 				if (v.material == "") then
 					model:SetMaterial("")
 				elseif (model:GetMaterial() != v.material) then
@@ -184,41 +157,30 @@ if CLIENT then
 				end
 				
 			elseif (v.type == "Sprite" and sprite) then
-				
 				local drawpos = pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z
 				render.SetMaterial(sprite)
 				render.DrawSprite(drawpos, v.size.x, v.size.y, v.color)
 				
 			elseif (v.type == "Quad" and v.draw_func) then
-				
 				local drawpos = pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z
 				ang:RotateAroundAxis(ang:Up(), v.angle.y)
 				ang:RotateAroundAxis(ang:Right(), v.angle.p)
 				ang:RotateAroundAxis(ang:Forward(), v.angle.r)
-				
 				cam.Start3D2D(drawpos, ang, v.size)
 					v.draw_func( self )
 				cam.End3D2D()
-
 			end
-			
 		end
-		
 	end
 
 	SWEP.wRenderOrder = nil
 	function SWEP:DrawWorldModel()
-		
 		if (self.ShowWorldModel == nil or self.ShowWorldModel) then
 			self:DrawModel()
 		end
-		
 		if (!self.WElements) then return end
-		
 		if (!self.wRenderOrder) then
-
 			self.wRenderOrder = {}
-
 			for k, v in pairs( self.WElements ) do
 				if (v.type == "Model") then
 					table.insert(self.wRenderOrder, 1, k)
@@ -226,9 +188,7 @@ if CLIENT then
 					table.insert(self.wRenderOrder, k)
 				end
 			end
-
 		end
-		
 		if (IsValid(self.Owner)) then
 			bone_ent = self.Owner
 		else
@@ -237,7 +197,6 @@ if CLIENT then
 		end
 		
 		for k, name in pairs( self.wRenderOrder ) do
-		
 			local v = self.WElements[name]
 			if (!v) then self.wRenderOrder = nil break end
 			if (v.hide) then continue end
@@ -256,14 +215,12 @@ if CLIENT then
 			local sprite = v.spriteMaterial
 			
 			if (v.type == "Model" and IsValid(model)) then
-
 				model:SetPos(pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z )
 				ang:RotateAroundAxis(ang:Up(), v.angle.y)
 				ang:RotateAroundAxis(ang:Right(), v.angle.p)
 				ang:RotateAroundAxis(ang:Forward(), v.angle.r)
 
 				model:SetAngles(ang)
-				//model:SetModelScale(v.size)
 				local matrix = Matrix()
 				matrix:Scale(v.size)
 				model:EnableMatrix( "RenderMultiply", matrix )
@@ -301,13 +258,11 @@ if CLIENT then
 				end
 				
 			elseif (v.type == "Sprite" and sprite) then
-				
 				local drawpos = pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z
 				render.SetMaterial(sprite)
 				render.DrawSprite(drawpos, v.size.x, v.size.y, v.color)
 				
 			elseif (v.type == "Quad" and v.draw_func) then
-				
 				local drawpos = pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z
 				ang:RotateAroundAxis(ang:Up(), v.angle.y)
 				ang:RotateAroundAxis(ang:Right(), v.angle.p)
@@ -316,20 +271,14 @@ if CLIENT then
 				cam.Start3D2D(drawpos, ang, v.size)
 					v.draw_func( self )
 				cam.End3D2D()
-
 			end
-			
 		end
-		
 	end
 
 	function SWEP:GetBoneOrientation( basetab, tab, ent, bone_override )
-		
 		local bone, pos, ang
 		if (tab.rel and tab.rel != "") then
-			
 			local v = basetab[tab.rel]
-			
 			if (!v) then return end
 			
 			// Technically, if there exists an element with the same name as a bone
@@ -337,18 +286,15 @@ if CLIENT then
 			pos, ang = self:GetBoneOrientation( basetab, v, ent )
 			
 			if (!pos) then return end
-			
+
 			pos = pos + ang:Forward() * v.pos.x + ang:Right() * v.pos.y + ang:Up() * v.pos.z
 			ang:RotateAroundAxis(ang:Up(), v.angle.y)
 			ang:RotateAroundAxis(ang:Right(), v.angle.p)
 			ang:RotateAroundAxis(ang:Forward(), v.angle.r)
 				
 		else
-		
 			bone = ent:LookupBone(bone_override or tab.bone)
-
 			if (!bone) then return end
-			
 			pos, ang = Vector(0,0,0), Angle(0,0,0)
 			local m = ent:GetBoneMatrix(bone)
 			if (m) then
@@ -359,16 +305,12 @@ if CLIENT then
 				ent == self.Owner:GetViewModel() and self.ViewModelFlip) then
 				ang.r = -ang.r // Fixes mirrored models
 			end
-		
 		end
-		
 		return pos, ang
 	end
 
 	function SWEP:CreateModels( tab )
-
 		if (!tab) then return end
-
 		// Create the clientside models here because Garry says we can't do it in the render hook
 		for k, v in pairs( tab ) do
 			if (v.type == "Model" and v.model and v.model != "" and (!IsValid(v.modelEnt) or v.createdModel != v.model) and 
@@ -403,21 +345,16 @@ if CLIENT then
 
 				v.createdSprite = v.sprite
 				v.spriteMaterial = CreateMaterial(name,"UnlitGeneric",params)
-				
 			end
 		end
-		
 	end
 	
 	local allbones
 	local hasGarryFixedBoneScalingYet = false
 
 	function SWEP:UpdateBonePositions(vm)
-		
 		if self.ViewModelBoneMods then
-			
 			if (!vm:GetBoneCount()) then return end
-			
 			// !! WORKAROUND !! //
 			// We need to check all model names :/
 			local loopthrough = self.ViewModelBoneMods
@@ -435,11 +372,9 @@ if CLIENT then
 						}
 					end
 				end
-				
 				loopthrough = allbones
 			end
 			// !! ----------- !! //
-			
 			for k, v in pairs( loopthrough ) do
 				local bone = vm:LookupBone(k)
 				if (!bone) then continue end
@@ -459,7 +394,6 @@ if CLIENT then
 				
 				s = s * ms
 				// !! ----------- !! //
-				
 				if vm:GetManipulateBoneScale(bone) != s then
 					vm:ManipulateBoneScale( bone, s )
 				end
@@ -473,18 +407,15 @@ if CLIENT then
 		else
 			self:ResetBonePositions(vm)
 		end
-		   
 	end
-	 
+
 	function SWEP:ResetBonePositions(vm)
-		
 		if (!vm:GetBoneCount()) then return end
 		for i=0, vm:GetBoneCount() do
 			vm:ManipulateBoneScale( i, Vector(1, 1, 1) )
 			vm:ManipulateBoneAngles( i, Angle(0, 0, 0) )
 			vm:ManipulateBonePosition( i, Vector(0, 0, 0) )
 		end
-		
 	end
 
 	/**************************
@@ -495,9 +426,7 @@ if CLIENT then
 	// Does not copy entities of course, only copies their reference.
 	// WARNING: do not use on tables that contain themselves somewhere down the line or you'll get an infinite loop
 	function table.FullCopy( tab )
-
 		if (!tab) then return nil end
-		
 		local res = {}
 		for k, v in pairs( tab ) do
 			if (type(v) == "table") then
@@ -510,15 +439,11 @@ if CLIENT then
 				res[k] = v
 			end
 		end
-		
 		return res
-		
 	end
-	
 end
 
--- ALL THE SHOOT STUFF ALL THE SHOOT STUFF ALL THE SHOOT STUFF ALL THE SHOOT STUFF ALL THE SHOOT STUFF ALL THE SHOOT STUFF ALL THE SHOOT STUFF ALL THE SHOOT STUFF ALL THE SHOOT STUFF
-
+-- ALL THE SHOOT STUFF
 local ShootSound = Sound("weapons/grenade_launcher1.wav")
 
 function SWEP:PrimaryAttack()		
@@ -562,9 +487,8 @@ function SWEP:PrimaryAttack()
 	self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )	
 end
 
-
 function SWEP:SecondaryAttack()
-	-- Nothing will happen
+	-- Nothing will happen :(
 end
 
 -- fire op
@@ -606,30 +530,30 @@ function SWEP:ThrowJunk(model_file)
     undo.Finish()
 end
 
-function SWEP:Think()				
+function SWEP:Think()
 end
 
-function SWEP:Reload()				
+function SWEP:Reload()
 	self:DefaultReload(ACT_VM_RELOAD)
 	return true
 end
 
-function SWEP:Deploy()				
+function SWEP:Deploy()
 	return true
 end
 
-function SWEP:Holster()				
+function SWEP:Holster()
 	return true
 end
 
-function SWEP:OnRemove()			
+function SWEP:OnRemove()
 end
 
-function SWEP:OnRestore()			
+function SWEP:OnRestore()
 end
 
-function SWEP:Precache()			
+function SWEP:Precache()
 end
 
-function SWEP:OwnerChanged()		
+function SWEP:OwnerChanged()
 end
