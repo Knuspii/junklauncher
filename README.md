@@ -3,6 +3,8 @@
 This is a Garry's Mod Addon\
 Link: https://steamcommunity.com/sharedfiles/filedetails/?id=2447510626
 
+![steamusercontent](images.steamusercontent.gif)
+
 Ever wanted to shoot junk? Well now you can with the "Junk Launcher"
 - This is my first SWEP
 - Left-click shoots random junk
