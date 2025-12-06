@@ -1,3 +1,6 @@
+![Steam Subscriptions](https://img.shields.io/steam/subscriptions/2447510626)
+![Steam Favorites](https://img.shields.io/steam/favorites/2447510626)
+
 # Junk Launcher SWEP
 
 This is a Garry's Mod Addon\
