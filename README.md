@@ -1,3 +1,4 @@
+[![Lua](https://img.shields.io/badge/Lua-%232C2D72.svg?logo=lua&logoColor=white)](#)
 ![Steam Subscriptions](https://img.shields.io/steam/subscriptions/2447510626)
 ![Steam Favorites](https://img.shields.io/steam/favorites/2447510626)
 
